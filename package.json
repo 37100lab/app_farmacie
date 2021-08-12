@@ -16,6 +16,7 @@
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "axios": "^0.21.1",
+    "dom-parser": "^0.1.6",
     "formik": "^2.2.9",
     "history": "^5.0.0",
     "ionicons": "^5.5.1",

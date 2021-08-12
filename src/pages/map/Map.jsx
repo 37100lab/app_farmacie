@@ -55,9 +55,6 @@ export class Map extends Component {
   
   state = {
     mapContainer: false,
-    farmacie:{},
-    quartieri:{},
-    circoscrizioni: {},
     center:[45.438351, 10.99171],
     mapCont:null,
     gpsError:false,
@@ -151,14 +148,13 @@ export class Map extends Component {
               query_layers: this.wmsParams.layers,
               info_format: 'text/html'
             };
-    
-        params[params.version === '1.3.0' ? 'i' : 'x'] = point.x;
-        params[params.version === '1.3.0' ? 'j' : 'y'] = point.y;
+
+        params[params.version === '1.3.0' ? 'i' : 'x'] = Math.floor(point.x);
+        params[params.version === '1.3.0' ? 'j' : 'y'] = Math.floor(point.y);
     
         // return this._url + L.Util.getParamString(params, this._url, true);
     
         var url = this._url + L.Util.getParamString(params, this._url, true);
-    
     
         /**
          * CORS workaround (using a basic php proxy)
@@ -262,15 +258,6 @@ export class Map extends Component {
               Chiudi
             </IonButton>
           </IonModal>
-        
-          <IonModal isOpen={apri}>
-            <IonHeader>Titolo</IonHeader>
-            <IonFooter>
-            <IonButton>
-              Chiudi
-            </IonButton>
-            </IonFooter>
-          </IonModal>
       
           {this.state.mapContainer && (
             <MapContainer
@@ -279,23 +266,6 @@ export class Map extends Component {
               zoom={zoom}
               whenCreated={mapCont => this.setState({ mapCont })}
             >
-
-            <LayersControl position="topright">
-              <LayersControl.BaseLayer checked name="Mappa base">
-                <TileLayer
-                  attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-              </LayersControl.BaseLayer>   
-              <LayersControl.BaseLayer name="Circoscrizioni">
-                <GeoJSON key='circoscrizioni' data={circoscrizioni.features} onEachFeature={this.OnEachCircoscrizione} />
-              </LayersControl.BaseLayer>      
-              <LayersControl.BaseLayer name="Quartieri">
-                <GeoJSON key='quartieri' data={quartieri.features} onEachFeature={this.OnEachQuartiere} />
-              </LayersControl.BaseLayer>
-            </LayersControl> 
-
-
               <TileLayer
                 attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -304,7 +274,7 @@ export class Map extends Component {
                 {map => {
                   map.setView(this.center)
                   //var wmsfarmacie_url="http://172.16.22.166:8080/geoserver/geoapp/wms?service=WMS&version=1.1.0&request=GetMap&layers=geoapp%3Afarmacie&bbox=10.899255752563477%2C45.38235855102539%2C11.06281566619873%2C45.49650573730469&width=768&height=535&srs=EPSG%3A4326&styles=&format=application/openlayers"
-                    var layer = L.tileLayer.betterWms("http://ec2-3-142-202-105.us-east-2.compute.amazonaws.com:8080/geoserver/geoapp/wms", {
+                  var layer = L.tileLayer.betterWms("http://ec2-3-142-202-105.us-east-2.compute.amazonaws.com:8080/geoserver/geoapp/wms", {
                     //var layer = L.tileLayer.betterWms("http://172.16.22.166:8080/geoserver/geoapp/wms", {
                     layers: "geoapp:farmacie",
                     format: "image/png",
