@@ -1,4 +1,4 @@
-# Farmacie di Verona
+# Farmacie di Verona!!!
 
 # Il progetto
 La seguente applicazione mobile nasce dall'esigenza di trovare in tempo reale ed istantaneamente più vicino alla nostra posizione attuale. L'obiettivo è quello di fornire uno strumento facile ed efficace, utilizzabile dai cittadini, per ottenere un servizio veloce ed affidabile nella consultazione di archivi comunali per un servizio informativo migliore.
