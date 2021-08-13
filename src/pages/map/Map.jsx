@@ -31,7 +31,7 @@ import {
   LayersControl,
 } from 'react-leaflet'
 
-import {dismissLocationModal} from '../../redux/actions'
+import { dismissLocationModal } from '../../redux/actions'
 import classes from './Map.module.css'
 
 //import LocationMarkers from '../../components/location/LocationMarkers'
@@ -48,27 +48,24 @@ import { locateSharp } from 'ionicons/icons'
 
 //NUOVI IMPORT
 import L from 'leaflet'
-import $ from "jquery"
-import _proxy from "jquery"
+import $ from 'jquery'
+import _proxy from 'jquery'
 
 export class Map extends Component {
-  
   state = {
     mapContainer: false,
-    center:[45.438351, 10.99171],
-    mapCont:null,
-    gpsError:false,
-    mostra:true,
+    center: [45.438351, 10.99171],
+    mapCont: null,
+    gpsError: false,
+    mostra: true,
   }
 
   async componentDidMount() {
     try {
-    
-    const res = await Geolocation.getCurrentPosition()
-    this.center=[res.coords.latitude, res.coords.longitude]
-
+      const res = await Geolocation.getCurrentPosition()
+      this.center = [res.coords.latitude, res.coords.longitude]
     } catch (e) {
-        this.setState({ gpsError: true })
+      this.setState({ gpsError: true })
     }
 
     if (this.state.mapContainer) return
@@ -78,84 +75,82 @@ export class Map extends Component {
     }, 500)
   }
 
-  
-
   //ON EACH METHODS
-  OnEachQuartiere = (quartiere, layer) =>{
+  OnEachQuartiere = (quartiere, layer) => {
     layer.bindPopup(stringManager.titleCase(quartiere.properties.quartiere))
   }
 
-  OnEachCircoscrizione = (paese, layer) =>{
+  OnEachCircoscrizione = (paese, layer) => {
     layer.bindPopup(stringManager.titleCase(paese.properties.circoscriz))
   }
 
   componentDidCatch() {
-    this.setState({gpsError:true})
+    this.setState({ gpsError: true })
   }
-
 
   render() {
     var apri = false
     L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
-
       onAdd: function (map) {
         // Triggered when the layer is added to a map.
         //   Register a click listener, then do all the upstream WMS things
-        L.TileLayer.WMS.prototype.onAdd.call(this, map);
-        map.on('click', this.getFeatureInfo, this);
+        L.TileLayer.WMS.prototype.onAdd.call(this, map)
+        map.on('click', this.getFeatureInfo, this)
       },
 
       onRemove: function (map) {
         // Triggered when the layer is removed from a map.
         //   Unregister a click listener, then do all the upstream WMS things
-        L.TileLayer.WMS.prototype.onRemove.call(this, map);
-        map.off('click', this.getFeatureInfo, this);
+        L.TileLayer.WMS.prototype.onRemove.call(this, map)
+        map.off('click', this.getFeatureInfo, this)
       },
-    
+
       getFeatureInfo: function (evt) {
         // Make an AJAX request to the server and hope for the best
         var url = this.getFeatureInfoUrl(evt.latlng),
-            showResults = L.Util.bind(this.showGetFeatureInfo, this);
+          showResults = L.Util.bind(this.showGetFeatureInfo, this)
         $.ajax({
           url: url,
           success: function (data, status, xhr) {
-            var err = typeof data === 'string' ? null : data;
-            showResults(err, evt.latlng, data);
+            var err = typeof data === 'string' ? null : data
+            showResults(err, evt.latlng, data)
           },
           error: function (xhr, status, error) {
-            showResults(error);
-          }
-        });
+            showResults(error)
+          },
+        })
       },
-      
+
       getFeatureInfoUrl: function (latlng) {
         // Construct a GetFeatureInfo request URL given a point
-        var point = this._map.latLngToContainerPoint(latlng, this._map.getZoom()),
-            size = this._map.getSize(),
-    
-            params = {
-              request: 'GetFeatureInfo',
-              service: 'WMS',
-              srs: 'EPSG:4326',
-              styles: this.wmsParams.styles,
-              transparent: this.wmsParams.transparent,
-              version: this.wmsParams.version,
-              format: this.wmsParams.format,
-              bbox: this._map.getBounds().toBBoxString(),
-              height: size.y,
-              width: size.x,
-              layers: this.wmsParams.layers,
-              query_layers: this.wmsParams.layers,
-              info_format: 'text/html'
-            };
+        var point = this._map.latLngToContainerPoint(
+            latlng,
+            this._map.getZoom()
+          ),
+          size = this._map.getSize(),
+          params = {
+            request: 'GetFeatureInfo',
+            service: 'WMS',
+            srs: 'EPSG:4326',
+            styles: this.wmsParams.styles,
+            transparent: this.wmsParams.transparent,
+            version: this.wmsParams.version,
+            format: this.wmsParams.format,
+            bbox: this._map.getBounds().toBBoxString(),
+            height: size.y,
+            width: size.x,
+            layers: this.wmsParams.layers,
+            query_layers: this.wmsParams.layers,
+            info_format: 'text/html',
+          }
 
-        params[params.version === '1.3.0' ? 'i' : 'x'] = Math.floor(point.x);
-        params[params.version === '1.3.0' ? 'j' : 'y'] = Math.floor(point.y);
-    
+        params[params.version === '1.3.0' ? 'i' : 'x'] = Math.floor(point.x)
+        params[params.version === '1.3.0' ? 'j' : 'y'] = Math.floor(point.y)
+
         // return this._url + L.Util.getParamString(params, this._url, true);
-    
-        var url = this._url + L.Util.getParamString(params, this._url, true);
-    
+
+        var url = this._url + L.Util.getParamString(params, this._url, true)
+
         /**
          * CORS workaround (using a basic php proxy)
          *
@@ -164,172 +159,175 @@ export class Map extends Component {
          *  - proxyParamName
          *
          */
-    
+
         // check if "proxy" option is defined (PS: path and file name)
-        if(typeof this.wmsParams.proxy !== "undefined") {
-    
+        if (typeof this.wmsParams.proxy !== 'undefined') {
           // check if proxyParamName is defined (instead, use default value)
-          if(typeof this.wmsParams.proxyParamName !== "undefined")
-            this.wmsParams.proxyParamName = 'url';
-    
+          if (typeof this.wmsParams.proxyParamName !== 'undefined')
+            this.wmsParams.proxyParamName = 'url'
+
           // build proxy (es: "proxy.php?url=" )
-          _proxy = this.wmsParams.proxy + '?' + this.wmsParams.proxyParamName + '=';
-    
-          url = _proxy + encodeURIComponent(url);
-    
+          _proxy =
+            this.wmsParams.proxy + '?' + this.wmsParams.proxyParamName + '='
+
+          url = _proxy + encodeURIComponent(url)
         }
-    
-        return url;
-    
+
+        return url
       },
 
       showGetFeatureInfo: function (err, latlng, content) {
-        if (err) { console.log(err); return; } // do nothing if there's an error
-        try{
+        if (err) {
+          console.log(err)
+          return
+        } // do nothing if there's an error
+        try {
           var DOMParser = require('dom-parser')
-          var parser = new DOMParser();
-          var doc = parser.parseFromString(content, 'text/html');
-         
+          var parser = new DOMParser()
+          var doc = parser.parseFromString(content, 'text/html')
+
           var x = doc.getElementsByTagName('td')[2].innerHTML
           var s1 = '<p>Farmacia: ' + x
           var y = doc.getElementsByTagName('td')[4].innerHTML
           s1 = s1 + '<p>Indirizzo: ' + y
           var z = doc.getElementsByTagName('td')[6].innerHTML
           s1 = s1 + '<p>Circoscrizione: ' + z
-          s1 = s1 + "<br><button onclick={console.log('Premuto')} type='button'>Info2</button>"
-    
-          L.popup()
-            .setLatLng(latlng)
-            .setContent(s1)
-            .openOn(this._map)
-            console.log("l'hai preso")
+          s1 =
+            s1 +
+            "<br><button onclick={console.log('Premuto')} type='button'>Info2</button>"
+
+          L.popup().setLatLng(latlng).setContent(s1).openOn(this._map)
+          console.log("l'hai preso")
+        } catch (error) {
+          console.log("non l'hai preso")
         }
-        catch(error){ console.log("non l'hai preso")  }
-      }
-    });
-    
+      },
+    })
+
     L.tileLayer.betterWms = function (url, options) {
-      return new L.TileLayer.BetterWMS(url, options);
-    };
-    
+      return new L.TileLayer.BetterWMS(url, options)
+    }
+
     const { zoom, locationClicked, showModal } = this.props.map
     const centerPosition = () => {
       console.log(this.center)
-      if(this.center)
-        this.state.mapCont.flyTo(this.center)
-      if(typeof this.center==='undefined')
-        this.setState({ gpsError: true })
+      if (this.center) this.state.mapCont.flyTo(this.center)
+      if (typeof this.center === 'undefined') this.setState({ gpsError: true })
     }
-    if(this.state.gpsError)
+    if (this.state.gpsError)
       return (
         <IonPage>
           <IonHeader>
             <IonToolbar>
-            <IonTitle>Farmacie a Verona</IonTitle>
+              <IonTitle>Farmacie a Verona</IonTitle>
             </IonToolbar>
-            </IonHeader>
-            <IonContent>
+          </IonHeader>
+          <IonContent>
             <IonList>
-            <IonItem>
-            <IonLabel className="ion-text-wrap">Errore nell'avvio dell'applicazione</IonLabel>
-            </IonItem>
-            <IonItem>
-            <IonLabel className="ion-text-wrap">Assicurarsi che il Geolocalizzazione 
-            e la connessione internet siano attive</IonLabel>
-            </IonItem>
+              <IonItem>
+                <IonLabel className="ion-text-wrap">
+                  Errore nell'avvio dell'applicazione
+                </IonLabel>
+              </IonItem>
+              <IonItem>
+                <IonLabel className="ion-text-wrap">
+                  Assicurarsi che il Geolocalizzazione e la connessione internet
+                  siano attive
+                </IonLabel>
+              </IonItem>
             </IonList>
           </IonContent>
         </IonPage>
       )
     else
-    return (
-      <IonPage>
-        <IonHeader>
-          <IonToolbar>
-            <IonTitle>Farmacie a Verona</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+      return (
+        <IonPage>
+          <IonHeader>
+            <IonToolbar>
+              <IonTitle>Farmacie a Verona</IonTitle>
+            </IonToolbar>
+          </IonHeader>
 
-        <IonContent id="content" fullscreen>
-          <IonModal isOpen={showModal} backdropDismiss={false}>   
-            { locationClicked && ( <LocationModal loc={locationClicked}/> )}
-            Testo 1234
-            <IonButton onClick={() => this.props.dismissLocationModal()}>
-              Chiudi
-            </IonButton>
-          </IonModal>
-      
-          {this.state.mapContainer && (
-            <MapContainer
-              className={classes.mapContainer}
-              center={this.center}
-              zoom={zoom}
-              whenCreated={mapCont => this.setState({ mapCont })}
-            >
-              <TileLayer
-                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              <MapConsumer>
-                {map => {
-                  map.setView(this.center)
-                  //var wmsfarmacie_url="http://172.16.22.166:8080/geoserver/geoapp/wms?service=WMS&version=1.1.0&request=GetMap&layers=geoapp%3Afarmacie&bbox=10.899255752563477%2C45.38235855102539%2C11.06281566619873%2C45.49650573730469&width=768&height=535&srs=EPSG%3A4326&styles=&format=application/openlayers"
-                  var layer = L.tileLayer.betterWms("http://ec2-3-142-202-105.us-east-2.compute.amazonaws.com:8080/geoserver/geoapp/wms", {
-                    //var layer = L.tileLayer.betterWms("http://172.16.22.166:8080/geoserver/geoapp/wms", {
-                    layers: "geoapp:farmacie",
-                    format: "image/png",
-                    transparent: true,
-                    attribution: "mylayerPARCHI",
-                   });
-                  layer.addTo(map);
-                  return null
-                }}
-              </MapConsumer>
-              <Marker position={this.center}>
-                <Popup>Tu sei qui
-                </Popup>
-              </Marker>
-             
-            </MapContainer>
-          )}
+          <IonContent id="content" fullscreen>
+            <IonModal isOpen={showModal} backdropDismiss={false}>
+              {locationClicked && <LocationModal loc={locationClicked} />}
+              Testo 1234
+              <IonButton onClick={() => this.props.dismissLocationModal()}>
+                Chiudi
+              </IonButton>
+            </IonModal>
 
-          <IonFab vertical="bottom" horizontal="end" slot="fixed">
-            <IonFabButton onClick={() => centerPosition()}>
-              <IonIcon icon={locateSharp} />
-            </IonFabButton>
-          </IonFab>
-        </IonContent>
+            {this.state.mapContainer && (
+              <MapContainer
+                className={classes.mapContainer}
+                center={this.center}
+                zoom={zoom}
+                whenCreated={mapCont => this.setState({ mapCont })}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <MapConsumer>
+                  {map => {
+                    map.setView(this.center)
+                    //var wmsfarmacie_url="http://172.16.22.166:8080/geoserver/geoapp/wms?service=WMS&version=1.1.0&request=GetMap&layers=geoapp%3Afarmacie&bbox=10.899255752563477%2C45.38235855102539%2C11.06281566619873%2C45.49650573730469&width=768&height=535&srs=EPSG%3A4326&styles=&format=application/openlayers"
+                    var layer = L.tileLayer.betterWms(
+                      'http://ec2-3-142-202-105.us-east-2.compute.amazonaws.com:8080/geoserver/geoapp/wms',
+                      {
+                        //var layer = L.tileLayer.betterWms("http://172.16.22.166:8080/geoserver/geoapp/wms", {
+                        layers: 'geoapp:farmacie',
+                        format: 'image/png',
+                        transparent: true,
+                        attribution: 'mylayerPARCHI',
+                      }
+                    )
+                    layer.addTo(map)
+                    return null
+                  }}
+                </MapConsumer>
+                <Marker position={this.center}>
+                  <Popup>Tu sei qui</Popup>
+                </Marker>
+              </MapContainer>
+            )}
 
-        <IonFooter>
-            <IonImg src={sponsor}
-            style={{maxWidth: "500px" , margin: "auto"}}
+            <IonFab vertical="bottom" horizontal="end" slot="fixed">
+              <IonFabButton onClick={() => centerPosition()}>
+                <IonIcon icon={locateSharp} />
+              </IonFabButton>
+            </IonFab>
+          </IonContent>
+
+          <IonFooter>
+            <IonImg
+              src={sponsor}
+              style={{ maxWidth: '500px', margin: 'auto' }}
             />
-        </IonFooter>
-        <IonToast
-        isOpen={this.state.gpsError}
-        color="danger"
-        onDidDismiss={() => 
-          this.setState({ gpsError: false })}
-        message="Problema di caricamento mappa. Il GPS è attivo?"
-        buttons={[
-          {
-            text: 'OK',
-            role: 'cancel',
-            handler: () => {
-              this.setState({ gpsError: false })
-            }
-          }
-        ]}
-      />
-    </IonPage>
-    
-    )
+          </IonFooter>
+          <IonToast
+            isOpen={this.state.gpsError}
+            color="danger"
+            onDidDismiss={() => this.setState({ gpsError: false })}
+            message="Problema di caricamento mappa. Il GPS è attivo?"
+            buttons={[
+              {
+                text: 'OK',
+                role: 'cancel',
+                handler: () => {
+                  this.setState({ gpsError: false })
+                },
+              },
+            ]}
+          />
+        </IonPage>
+      )
   }
 }
 const mapStateToProps = state => ({
   map: state.map,
 })
 
-const mapDispatchToProps = {dismissLocationModal}
+const mapDispatchToProps = { dismissLocationModal }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Map)
