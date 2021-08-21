@@ -1,6 +1,7 @@
 # Farmacie di Verona
 
-[![Deploy](https://github.com/ahmedaidev/geo-farmacie/actions/workflows/deploy.yml/badge.svg)](https://github.com/ahmedaidev/geo-farmacie/actions/workflows/deploy.yml)
+[![Deploy Web](https://github.com/ahmedaidev/geo-farmacie/actions/workflows/deploy-web.yml/badge.svg)](https://github.com/ahmedaidev/geo-farmacie/actions/workflows/deploy-web.yml)
+[![Publish Android](https://github.com/ahmedaidev/geo-farmacie/actions/workflows/publish-android.yml/badge.svg)](https://github.com/ahmedaidev/geo-farmacie/actions/workflows/publish-android.yml)
 
 # Il progetto
 
