@@ -13,13 +13,27 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install dependencies
-        run: yarn
+        run: npm install
+
+      - name: Add android to ionic
+        run: npm run add:android
 
       - name: Generate android production build
-        run: yarn build:android
+        run: npm run sync
 
-      - name: Build apk & publish to GitHub artifacts
+      - name: Build apk
         uses: sparkfabrik/android-build-action@v1.0.0
         with:
           project-path: android
           output-path: geo-farmacie.apk
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: geo-farmacie.apk
+          path: geo-farmacie.apk
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: geo-farmacie.apk
