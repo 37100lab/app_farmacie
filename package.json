@@ -2,14 +2,15 @@
   "name": "geo-farmacie",
   "homepage": "https://ahmedaidev.github.io/geo-farmacie",
   "version": "1.0.0",
-  "private": true,
   "dependencies": {
-    "@capacitor/android": "3.1.2",
+    "@capacitor/android": "3.2.0",
     "@capacitor/camera": "^1.0.1",
+    "@capacitor/cli": "^3.2.0",
     "@capacitor/core": "3.0.1",
     "@capacitor/filesystem": "^1.0.1",
     "@capacitor/geolocation": "^1.0.2",
     "@capacitor/storage": "^1.0.1",
+    "@ionic/cli": "^6.17.0",
     "@ionic/pwa-elements": "^3.0.2",
     "@ionic/react": "^5.6.9",
     "@ionic/react-router": "^5.6.9",
@@ -43,7 +44,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "push-dir --dir=build --branch=gh-pages --cleanup"
+    "add:android": "ionic cap add android",
+    "sync": "ionic cap sync"
   },
   "eslintConfig": {
     "extends": [
@@ -55,8 +57,5 @@
     ">0.2%",
     "not dead",
     "not op_mini all"
-  ],
-  "devDependencies": {
-    "@capacitor/cli": "3.0.1"
-  }
+  ]
 }

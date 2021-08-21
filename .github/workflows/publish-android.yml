@@ -1,0 +1,25 @@
+name: Publish Android
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Generate android production build
+        run: yarn build:android
+
+      - name: Build apk & publish to GitHub artifacts
+        uses: sparkfabrik/android-build-action@v1.0.0
+        with:
+          project-path: android
+          output-path: geo-farmacie.apk
