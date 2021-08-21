@@ -1,6 +1,6 @@
 {
-  "appId": "com.geoapp.front",
-  "appName": "geoapp-front",
+  "appId": "com.geo.farmacie",
+  "appName": "geo-farmacie",
   "webDir": "build",
   "bundledWebRuntime": false
 }
