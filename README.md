@@ -1,7 +1,6 @@
 # Farmacie di Verona
 
-[![Deploy Web](https://github.com/ahmedaidev/geo-farmacie/actions/workflows/deploy-web.yml/badge.svg)](https://github.com/ahmedaidev/geo-farmacie/actions/workflows/deploy-web.yml)
-[![Publish Android](https://github.com/ahmedaidev/geo-farmacie/actions/workflows/publish-android.yml/badge.svg)](https://github.com/ahmedaidev/geo-farmacie/actions/workflows/publish-android.yml)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/acf2f465-3ee0-4511-afdc-73d0e95f51b8/deploy-status)](https://app.netlify.com/sites/geo-farmacie/deploys)
 
 # Il progetto
 
