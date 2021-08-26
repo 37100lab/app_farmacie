@@ -1,5 +1,6 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
+import classes from './Map.module.css'
 import {
   IonContent,
   IonHeader,
@@ -13,228 +14,104 @@ import {
   IonFab,
   IonFabButton,
   IonIcon,
-  IonLabel,
-  IonToast,
-  IonList,
-  IonItem,
+  IonProgressBar,
 } from '@ionic/react'
-
-import stringManager from '../../utility/stringManager'
-
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  MapConsumer,
-  GeoJSON,
-  LayersControl,
-} from 'react-leaflet'
-
-import { dismissLocationModal } from '../../redux/actions'
-import classes from './Map.module.css'
-
-import LocationMarkers from '../../components/location/LocationMarkers'
-import LocationModal from '../../components/location/LocationModal'
-
 import { Geolocation } from '@capacitor/geolocation'
-import circoscrizioni from '../../data/circoscrizioni.json'
-import quartieri from '../../data/quartieri.json'
+
+import { MapContainer, TileLayer } from 'react-leaflet'
+import { locateSharp } from 'ionicons/icons'
+
+import FeatureList from '../../components/FeatureList'
+import FeatureModal from '../../components/FeatureModal'
+import { dismissLocationModal } from '../../redux/actions'
 
 import sponsor from '../../assets/img/sponsor.jpg'
-import { locateSharp } from 'ionicons/icons'
-import { url } from '../../config/config'
+import { useEffect } from 'react'
+import Toast from '../../components/Toast'
+import PositionMarker from '../../components/PositionMarker'
+import { setGps } from '../../redux/actions'
+import Layers from '../../components/Layers'
 
-export class Map extends Component {
-  state = {
-    mapContainer: false,
-    farmacie: {},
-    quartieri: {},
-    circoscrizioni: {},
-    center: [45.438351, 10.99171],
-    mapCont: null,
-    gpsError: false,
-  }
+const Map = ({ map, loading, fetchError, setGps, dismissLocationModal }) => {
+  const [showMap, setShowMap] = useState(false)
+  const [gpsError, setGpsError] = useState('')
 
-  async componentDidMount() {
-    try {
-      const res = await Geolocation.getCurrentPosition()
-      this.center = [res.coords.latitude, res.coords.longitude]
-    } catch (e) {
-      this.setState({ gpsError: true })
-    }
-
-    this.GetFarmacie()
-    if (this.state.mapContainer) return
-
+  useEffect(() => {
+    if (showMap) return
     setTimeout(() => {
-      this.setState({ mapContainer: true })
-    }, 500)
-  }
+      setShowMap(true)
+    }, 1000)
+  }, [showMap])
 
-  GetFarmacie() {
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Success:', data)
-        this.setState({ farmacie: data })
-      })
-      .catch(error => {
-        console.error('Error:', error)
-      })
-  }
-
-  //ON EACH METHODS
-  OnEachQuartiere = (quartiere, layer) => {
-    layer.bindPopup(stringManager.titleCase(quartiere.properties.quartiere))
-  }
-
-  OnEachCircoscrizione = (paese, layer) => {
-    layer.bindPopup(stringManager.titleCase(paese.properties.circoscriz))
-  }
-
-  componentDidCatch() {
-    this.setState({ gpsError: true })
-  }
-
-  render() {
-    const { zoom, locationClicked, showModal } = this.props.map
-
-    const centerPosition = () => {
-      console.log(this.center)
-      if (this.center) this.state.mapCont.flyTo(this.center)
-      if (typeof this.center === 'undefined') this.setState({ gpsError: true })
+  const getCurrentPosition = async () => {
+    try {
+      setGpsError('')
+      const position = await Geolocation.getCurrentPosition()
+      setGps([position.coords.latitude, position.coords.longitude])
+    } catch (err) {
+      setGpsError(err.message)
     }
-    if (this.state.gpsError)
-      return (
-        <IonPage>
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>Farmacie a Verona</IonTitle>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent>
-            <IonList>
-              <IonItem>
-                <IonLabel className="ion-text-wrap">
-                  Errore nell'avvio dell'applicazione
-                </IonLabel>
-              </IonItem>
-              <IonItem>
-                <IonLabel className="ion-text-wrap">
-                  Assicurarsi che il Geolocalizzazione e la connessione internet
-                  siano attive
-                </IonLabel>
-              </IonItem>
-            </IonList>
-          </IonContent>
-        </IonPage>
-      )
-    else
-      return (
-        <IonPage>
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>Farmacie a Verona</IonTitle>
-            </IonToolbar>
-          </IonHeader>
-
-          <IonContent id="content" fullscreen>
-            <IonModal isOpen={showModal} backdropDismiss={false}>
-              {locationClicked && <LocationModal loc={locationClicked} />}
-              <IonButton onClick={() => this.props.dismissLocationModal()}>
-                Chiudi
-              </IonButton>
-            </IonModal>
-
-            {this.state.mapContainer && (
-              <MapContainer
-                className={classes.mapContainer}
-                center={this.center}
-                zoom={zoom}
-                whenCreated={mapCont => this.setState({ mapCont })}
-              >
-                <LayersControl position="topright">
-                  <LayersControl.BaseLayer checked name="Mappa base">
-                    <TileLayer
-                      attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                  </LayersControl.BaseLayer>
-                  <LayersControl.BaseLayer name="Circoscrizioni">
-                    <GeoJSON
-                      key="circoscrizioni"
-                      data={circoscrizioni.features}
-                      onEachFeature={this.OnEachCircoscrizione}
-                    />
-                  </LayersControl.BaseLayer>
-                  <LayersControl.BaseLayer name="Quartieri">
-                    <GeoJSON
-                      key="quartieri"
-                      data={quartieri.features}
-                      onEachFeature={this.OnEachQuartiere}
-                    />
-                  </LayersControl.BaseLayer>
-                </LayersControl>
-
-                <TileLayer
-                  attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <MapConsumer>
-                  {map => {
-                    map.setView(this.center)
-                    return null
-                  }}
-                </MapConsumer>
-                <Marker position={this.center}>
-                  <Popup>Tu sei qui</Popup>
-                </Marker>
-                <LocationMarkers myloc={this.state.farmacie.features} />
-              </MapContainer>
-            )}
-
-            <IonFab vertical="bottom" horizontal="end" slot="fixed">
-              <IonFabButton onClick={() => centerPosition()}>
-                <IonIcon icon={locateSharp} />
-              </IonFabButton>
-            </IonFab>
-          </IonContent>
-
-          <IonFooter>
-            <IonImg
-              src={sponsor}
-              style={{ maxWidth: '500px', margin: 'auto' }}
-            />
-          </IonFooter>
-          <IonToast
-            isOpen={this.state.gpsError}
-            color="danger"
-            onDidDismiss={() => this.setState({ gpsError: false })}
-            message="Problema di caricamento mappa. Il GPS è attivo?"
-            buttons={[
-              {
-                text: 'OK',
-                role: 'cancel',
-                handler: () => {
-                  this.setState({ gpsError: false })
-                },
-              },
-            ]}
-          />
-        </IonPage>
-      )
   }
+
+  const { center, zoom, position, feature, showModal } = map
+
+  return (
+    <IonPage>
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>Farmacie a Verona</IonTitle>
+          {loading && <IonProgressBar type="indeterminate"></IonProgressBar>}
+          {fetchError && (
+            <Toast message="Failed to fetch data" color="danger" />
+          )}
+        </IonToolbar>
+      </IonHeader>
+
+      <IonContent id="content" fullscreen>
+        <IonModal isOpen={showModal} backdropDismiss={false}>
+          {feature && <FeatureModal feature={feature} />}
+          <IonButton onClick={() => dismissLocationModal()}>Chiudi</IonButton>
+        </IonModal>
+
+        {showMap && (
+          <MapContainer
+            className={classes.mapContainer}
+            center={center}
+            zoom={zoom}
+          >
+            <Layers />
+
+            <TileLayer
+              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+
+            {position.length > 0 && <PositionMarker coords={position} />}
+            <FeatureList />
+          </MapContainer>
+        )}
+
+        <IonFab vertical="bottom" horizontal="end" slot="fixed">
+          <IonFabButton onClick={getCurrentPosition}>
+            <IonIcon icon={locateSharp} />
+          </IonFabButton>
+        </IonFab>
+        {gpsError && <Toast message={gpsError} color="danger" />}
+      </IonContent>
+
+      <IonFooter>
+        <IonImg src={sponsor} style={{ maxWidth: '500px', margin: 'auto' }} />
+      </IonFooter>
+    </IonPage>
+  )
 }
+
 const mapStateToProps = state => ({
   map: state.map,
+  loading: state.feature.loading,
+  fetchError: state.feature.error,
 })
 
-const mapDispatchToProps = { dismissLocationModal }
+const mapDispatchToProps = { setGps, dismissLocationModal }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Map)

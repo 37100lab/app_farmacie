@@ -1,20 +1,32 @@
-import { DISMISS_LOCATION_MODAL, SET_VIEW, SHOW_LOCATION_MODAL } from '../actions/types'
+import {
+  SHOW_LOCATION_MODAL,
+  DISMISS_LOCATION_MODAL,
+  SET_CURRENT_POSITION,
+} from '../actions/types'
 
 const initialState = {
   center: [45.438351, 10.99171],
-  zoom: 14,
-  locationClicked: null,
-  showModal: false
+  zoom: 12,
+  position: [],
+  feature: {},
+  showModal: false,
 }
 
 const mapReducer = (state = initialState, { type, payload }) => {
   switch (type) {
-    case SET_VIEW:
-      return { ...state, center: [payload.lat, payload.lng] }
+    case SET_CURRENT_POSITION:
+      return {
+        ...state,
+        position: payload,
+      }
     case SHOW_LOCATION_MODAL:
-      return { ...state, locationClicked: payload.locationClicked, showModal: true}
+      return {
+        ...state,
+        feature: payload,
+        showModal: true,
+      }
     case DISMISS_LOCATION_MODAL:
-      return { ...state, showModal: false}
+      return { ...state, showModal: false }
     default:
       return state
   }

@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux'
-import authReducer from './auth'
 import mapReducer from './map'
+import featureReducer from './features'
 
 export default combineReducers({
-  auth: authReducer,
   map: mapReducer,
+  feature: featureReducer,
 })
