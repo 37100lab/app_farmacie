@@ -25,23 +25,21 @@ const FeatureList = ({ fetchFeatures, features }) => {
   }
 
   return (
-    <div>
-      <MarkerClusterGroup>
-        {features.length > 0 &&
-          features.map(feature => (
-            <Marker
-              key={feature.id}
-              position={_.reverse(feature.geometry.coordinates)}
-              icon={farmaciaIcon}
-              eventHandlers={{ click: onClick }}
-            >
-              <Popup>
-                <Feature feature={feature} />
-              </Popup>
-            </Marker>
-          ))}
-      </MarkerClusterGroup>
-    </div>
+    <MarkerClusterGroup>
+      {features.length > 0 &&
+        features.map(feature => (
+          <Marker
+            key={feature.id}
+            position={_.reverse(feature.geometry.coordinates)}
+            icon={farmaciaIcon}
+            eventHandlers={{ click: onClick }}
+          >
+            <Popup>
+              <Feature feature={feature} />
+            </Popup>
+          </Marker>
+        ))}
+    </MarkerClusterGroup>
   )
 }
 
