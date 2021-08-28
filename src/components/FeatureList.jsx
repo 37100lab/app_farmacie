@@ -18,8 +18,8 @@ const FeatureList = ({ fetchFeatures, features }) => {
   useEffect(() => {
     fetchFeatures()
   }, [fetchFeatures])
-  const map = useMap()
 
+  const map = useMap()
   const onClick = e => {
     map.flyTo([e.latlng.lat, e.latlng.lng])
   }

@@ -23,7 +23,7 @@ const categoryConfig = {
   },
 }
 
-export const FeatureModal = ({ feature }) => {
+const FeatureModal = ({ feature }) => {
   return (
     <IonContent>
       <IonHeader>
